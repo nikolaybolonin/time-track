@@ -83,6 +83,7 @@ module.exports = {
     'linebreak-style': 'off',
     'multiline-ternary': 'off',
     'import/order': 'off',
+    'no-nested-ternary': 'off',
     'no-param-reassign': 'off',
     'consistent-return': 'off',
     'no-underscore-dangle': 'off',
