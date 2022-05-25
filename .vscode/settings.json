@@ -1,0 +1,69 @@
+{
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  "window.zoomLevel": 0,
+
+  // Existing jsconfig.json or tsconfig.json files override this setting:
+  // "javascript.implicitProjectConfig.experimentalDecorators": true,
+  // "javascript.implicitProjectConfig.checkJs": false,
+
+  "editor.tabSize": 2,
+  "editor.wordWrap": "on",
+  "editor.wordWrapColumn": 100,
+  "editor.autoClosingQuotes": "never",
+  "editor.detectIndentation": false,
+  "editor.foldingMaximumRegions": 10000,
+  // https://rohit.page/blog/posts/how-to-get-prettier-eslint-play-nicely-with-vscode/
+  "editor.formatOnSave": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": [
+    // for Prettier via https://marketplace.visualstudio.com/items?itemName=rohit-gohri.format-code-action
+    "source.fixAll.format",
+    // for ESLint
+    "source.fixAll.eslint",
+    // for Stylelint
+    "source.fixAll.stylelint"
+  ],
+
+  // Overrides:
+  "[javascript]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+
+    // "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[typescript]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescriptreact]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[scss]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "stylelint.vscode-stylelint",
+    "editor.codeActionsOnSave": [
+      // for Stylelint
+      "source.fixAll.stylelint"
+    ]
+  },
+
+  "diffEditor.ignoreTrimWhitespace": false,
+
+  // Formatters settings:
+  "prettier.enable": true,
+  "prettier.configPath": "./.prettierrc",
+  "prettier.useEditorConfig": true,
+
+  "eslint.lintTask.enable": true,
+  "eslint.format.enable": true,
+  "eslint.alwaysShowStatus": true,
+  "eslint.codeActionsOnSave.mode": "all",
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+
+  "stylelint.enable": true,
+  "stylelint.configBasedir": "./",
+  "stylelint.validate": ["css", "scss"],
+  "stylelint.customSyntax": "postcss-scss"
+}

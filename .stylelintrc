@@ -1,0 +1,18 @@
+{
+  "ignoreFiles": ["node_modules/**/*", ".next-container/**/*", ".next/**/*"],
+  "customSyntax": "postcss-scss",
+  "plugins": ["stylelint-scss"],
+  "extends": ["stylelint-config-standard-scss"],
+  "rules": {
+    "selector-max-id": 1,
+    "indentation": 2,
+    "number-leading-zero": "never",
+    "string-no-newline": null,
+    "scss/comment-no-empty": null,
+    "no-descending-specificity": null,
+    "scss/no-global-function-names": null,
+    "scss/double-slash-comment-whitespace-inside": null,
+    "declaration-block-no-redundant-longhand-properties": null,
+    "scss/at-import-partial-extension": ["always", null, { "except": ["scss"] }]
+  }
+}

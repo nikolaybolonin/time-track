@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-
 export const Body = styled.div`
   position: relative;
   width: 100%;
@@ -17,14 +16,12 @@ export const Body = styled.div`
   color: white;
 `;
 
-function App() {
+const App = (): JSX.Element => {
   return (
     <Body>
-      <header className="App-header">
-Timetracker
-      </header>
+      <header className="App-header">Timetracker</header>
     </Body>
   );
-}
+};
 
 export default App;
