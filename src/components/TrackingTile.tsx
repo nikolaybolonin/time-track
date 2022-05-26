@@ -26,25 +26,25 @@ export const Heading = styled.h4`
 export const Category = styled.div`
   position: absolute;
   width: 100px;
-  height: 14px;
-  top: 5px;
-  left: 5px;
+  height: 0.7em;
+  top: 0.5em;
+  left: 0.5em;
 
-  font-size: 14px;
-  line-height: 14px;
+  font-size: 0.7em;
+  line-height: 0.7em;
   color: lime;
 `;
 
 export const CloseButton = styled.div`
   position: absolute;
-  width: 30px;
-  height: 30px;
-  top: 5px;
-  right: 5px;
+  width: 1em;
+  height: 1em;
+  top: 0.4em;
+  right: 0.1em;
   overflow: visible;
 
-  font-size: 30px;
-  line-height: 30px;
+  font-size: 1em;
+  line-height: 1em;
 `;
 
 export type Tile = {

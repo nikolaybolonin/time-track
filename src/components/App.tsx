@@ -19,22 +19,21 @@ export const Body = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(4vmin);
   color: white;
 `;
 
 export const Header = styled.header`
-  margin-bottom: 20px;
+  margin: 0.9em 0;
 `;
 
 export const Frame = styled.div`
   position: relative;
-  width: min(100%, 600px);
+  width: min(100%, 1000px);
   min-height: 100%;
-  border: 1px solid white;
   box-sizing: border-box;
 
-  padding: 5px;
+  padding: 0.3em;
 
   display: grid;
   grid-template-columns: minmax(50%, 100px) minmax(50%, 100px);
@@ -51,10 +50,10 @@ export const Frame = styled.div`
 
 export const TileWrapper = styled.div`
   background: rgba(0, 0, 0, 0.1);
-  border: 4px white solid;
-  margin: 5px;
+  border: 0.2em white solid;
+  margin: 0.3em;
   border-radius: 5%;
-  transition: border 0.3s ease 0s;
+  transition: border-color 0.3s ease 0s;
 
   &:first-child {
     grid-row: 1 / 1;
@@ -62,7 +61,7 @@ export const TileWrapper = styled.div`
   }
 
   &:hover {
-    border: 4px red solid;
+    border-color: red;
   }
 `;
 
