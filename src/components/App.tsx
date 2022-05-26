@@ -4,7 +4,9 @@ import styled from 'styled-components';
 
 import { useLocalStorage } from '../utils/hooks';
 
+import { activities } from '../utils/const';
 import { parseJSON } from '../utils/utils';
+import { AddNewTile } from './AddNewTile';
 import { Tile, TrackingTile } from './TrackingTile';
 
 export const Body = styled.div`
@@ -66,37 +68,59 @@ export const TileWrapper = styled.div`
 
 const initialTiles = [
   {
-    category: '1',
+    category: activities.selftime,
     activity: 'Coding',
   },
   {
-    category: '2',
+    category: activities.work,
     activity: 'Working',
   },
   {
-    category: '3',
+    category: activities.animals,
     activity: 'Playing with dog',
   },
   {
-    category: '3',
+    category: activities.animals,
     activity: 'Walking with dog',
   },
   {
-    category: '3',
+    category: activities.animals,
     activity: 'Feeding the dog',
   },
   {
-    category: '3',
+    category: activities.animals,
     activity: 'Feeding the cat',
   },
   {
-    category: '3',
+    category: activities.animals,
     activity: 'Cleaning after the cat',
   },
 ].map(item => ({ ...item, id: uniqueId() }));
 
 const App = (): JSX.Element => {
   const [tiles, updateTiles] = useLocalStorage('tiles', initialTiles as Tile[]);
+
+  const addNewTile = useCallback(
+    (tileData: Tile) => {
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      // get latest Tile beacuse of lack of performance of the useLocalStorage hook
+      const latestTiles = parseJSON(
+        window.localStorage.getItem('tiles'),
+      ) as Tile[];
+
+      const newTiles = [
+        ...(latestTiles || []),
+        { ...tileData, id: uniqueId() },
+      ];
+
+      updateTiles(newTiles);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [updateTiles],
+  );
 
   const removeTile = useCallback(
     (tileData: Tile) => {
@@ -163,7 +187,7 @@ const App = (): JSX.Element => {
       <Header>Timetracker</Header>
       <Frame>
         {tiles.map(data => (
-          <TileWrapper key={data.activity}>
+          <TileWrapper key={data.id}>
             <TrackingTile
               {...data}
               updateTile={updateTile}
@@ -171,6 +195,8 @@ const App = (): JSX.Element => {
             />
           </TileWrapper>
         ))}
+
+        <AddNewTile addNewTile={addNewTile} />
       </Frame>
     </Body>
   );

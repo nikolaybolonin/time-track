@@ -23,6 +23,18 @@ export const Heading = styled.h4`
   text-align: center;
 `;
 
+export const Category = styled.div`
+  position: absolute;
+  width: 100px;
+  height: 14px;
+  top: 5px;
+  left: 5px;
+
+  font-size: 14px;
+  line-height: 14px;
+  color: lime;
+`;
+
 export const CloseButton = styled.div`
   position: absolute;
   width: 30px;
@@ -30,11 +42,13 @@ export const CloseButton = styled.div`
   top: 5px;
   right: 5px;
   overflow: visible;
+
+  font-size: 30px;
+  line-height: 30px;
 `;
 
 export type Tile = {
   id: string;
-  // eslint-disable-next-line react/no-unused-prop-types
   category?: string;
   activity?: string;
   time?: number;
@@ -48,6 +62,7 @@ interface TrackingTileProps extends Tile {
 
 export const TrackingTile = ({
   id,
+  category,
   activity,
   updateTile,
   removeTile,
@@ -98,6 +113,7 @@ export const TrackingTile = ({
 
   return (
     <TileContainer onClick={onClickTile}>
+      <Category>{category}</Category>
       <Heading>{activity}</Heading>
 
       {/* <span>{time}</span> */}
