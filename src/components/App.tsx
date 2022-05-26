@@ -1,19 +1,22 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import uniqueId from 'lodash/uniqueId';
 import styled from 'styled-components';
 
-import TrackingTile from './TrackingTile';
+import { useLocalStorage } from '../utils/hooks';
+
+import { parseJSON } from '../utils/utils';
+import { Tile, TrackingTile } from './TrackingTile';
 
 export const Body = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  justify-content: center;
   background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   font-size: calc(10px + 2vmin);
   color: white;
 `;
@@ -61,7 +64,7 @@ export const TileWrapper = styled.div`
   }
 `;
 
-const tiles = [
+const initialTiles = [
   {
     category: '1',
     activity: 'Coding',
@@ -90,16 +93,82 @@ const tiles = [
     category: '3',
     activity: 'Cleaning after the cat',
   },
-];
+].map(item => ({ ...item, id: uniqueId() }));
 
 const App = (): JSX.Element => {
+  const [tiles, updateTiles] = useLocalStorage('tiles', initialTiles as Tile[]);
+
+  const removeTile = useCallback(
+    (tileData: Tile) => {
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      const { id } = tileData;
+      // get latest Tile beacuse of lack of performance of the useLocalStorage hook
+      const latestTiles = parseJSON(
+        window.localStorage.getItem('tiles'),
+      ) as Tile[];
+
+      if (!latestTiles) {
+        return;
+      }
+
+      const newTiles = latestTiles.filter(item => item.id !== id);
+
+      updateTiles(newTiles);
+
+      if (!newTiles.length) {
+        window.localStorage.removeItem('tiles');
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [updateTiles],
+  );
+
+  const updateTile = useCallback(
+    (tileData: Tile) => {
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      const { id } = tileData;
+      // get latest Tile beacuse of lack of performance of the useLocalStorage hook
+      const latestTiles = parseJSON(
+        window.localStorage.getItem('tiles'),
+      ) as Tile[];
+
+      if (!latestTiles) {
+        return;
+      }
+
+      const newTiles = latestTiles.map(item => {
+        if (item.id === id) {
+          return {
+            ...item,
+            ...tileData,
+          };
+        }
+        return item;
+      });
+
+      updateTiles(newTiles);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [updateTiles],
+  );
+
   return (
     <Body>
       <Header>Timetracker</Header>
       <Frame>
         {tiles.map(data => (
           <TileWrapper key={data.activity}>
-            <TrackingTile {...data} />
+            <TrackingTile
+              {...data}
+              updateTile={updateTile}
+              removeTile={removeTile}
+            />
           </TileWrapper>
         ))}
       </Frame>
