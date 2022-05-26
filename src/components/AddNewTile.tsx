@@ -12,10 +12,12 @@ export const Input = styled.input`
   margin: 2px;
   margin-bottom: 12px;
 `;
+
 export const Label = styled.label`
   font-size: 14px;
   line-height: 14px;
 `;
+
 export const Button = styled.div`
   display: flex;
   justify-content: center;
@@ -49,6 +51,8 @@ export const AddNewTile = ({ addNewTile }: AddNewTileProps): JSX.Element => {
   const onClickTile = useCallback(() => {
     if (!active) {
       setActive(true);
+      // eslint-disable-next-line no-console
+      console.log('test');
     }
   }, [active]);
 
