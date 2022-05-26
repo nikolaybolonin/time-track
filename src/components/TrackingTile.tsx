@@ -32,7 +32,7 @@ export const Category = styled.div`
 
   font-size: 0.7em;
   line-height: 0.7em;
-  color: lime;
+  opacity: 0.9;
 `;
 
 export const CloseButton = styled.div`
@@ -45,6 +45,14 @@ export const CloseButton = styled.div`
 
   font-size: 1em;
   line-height: 1em;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+`;
+
+export const ResetButton = styled(CloseButton)`
+  top: auto;
+  bottom: 0.4em;
 `;
 
 export type Tile = {
@@ -95,6 +103,25 @@ export const TrackingTile = ({
     [removeTile],
   );
 
+  const onClickR: React.MouseEventHandler<Element> = useCallback(
+    event => {
+      event.stopPropagation();
+      setTime(0);
+      if (lastTimeStamp) {
+        const timestamp = Date.now();
+        setTimeStamp(0);
+        setTimeout(() => {
+          setTimer(0);
+          setTimeStamp(timestamp);
+        }, 100);
+      } else {
+        setTimer(0);
+      }
+      updateTile({ id, time: 0 });
+    },
+    [lastTimeStamp, updateTile],
+  );
+
   useEffect(() => {
     updateTile({ id, time, lastTimeStamp });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -120,7 +147,8 @@ export const TrackingTile = ({
       <TimerDisplay active={!!lastTimeStamp}>{timer}</TimerDisplay>
       {/* <span>{lastTimeStamp}</span> */}
 
-      {removeTile && <CloseButton onClick={onClickX}>x</CloseButton>}
+      {removeTile && <CloseButton onClick={onClickX}>X</CloseButton>}
+      <ResetButton onClick={onClickR}>R</ResetButton>
     </TileContainer>
   );
 };
