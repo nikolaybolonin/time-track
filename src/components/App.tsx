@@ -1,12 +1,13 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 import { useLocalStorage } from '../utils/hooks';
 
 import { activities } from '../utils/const';
-import { generateId, parseJSON } from '../utils/utils';
-import { AddNewTile } from './AddNewTile';
-import { Tile, TrackingTile } from './TrackingTile';
+import { generateId } from '../utils/utils';
+import AllTrackers from './AllTrackers';
+import Chart from './Chart';
+import { Tile } from './TrackingTile';
 
 export const Body = styled.div`
   position: relative;
@@ -22,45 +23,20 @@ export const Body = styled.div`
   color: white;
 `;
 
-export const Header = styled.header`
+export const Head = styled.header`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+  justify-content: space-evenly;
+`;
+
+export const Heading = styled.header`
   margin: 0.9em 0;
-`;
-
-export const Frame = styled.div`
-  position: relative;
-  width: min(100%, 1000px);
-  min-height: 100%;
-  box-sizing: border-box;
-
-  padding: 0.3em;
-
-  display: grid;
-  grid-template-columns: minmax(50%, 100px) minmax(50%, 100px);
-  grid-auto-rows: 1fr;
-
-  &:before {
-    content: '';
-    width: 0;
-    padding-bottom: 100%;
-    grid-row: 1 / 1;
-    grid-column: 1 / 1;
-  }
-`;
-
-export const TileWrapper = styled.div`
-  background: rgba(0, 0, 0, 0.1);
-  border: 0.2em white solid;
-  margin: 0.3em;
-  border-radius: 5%;
-  transition: border-color 0.3s ease 0s;
-
-  &:first-child {
-    grid-row: 1 / 1;
-    grid-column: 1 / 1;
-  }
+  cursor: pointer;
 
   &:hover {
-    border-color: red;
+    color: red;
   }
 `;
 
@@ -98,110 +74,30 @@ const initialTiles = [
   id: generateId(10),
 }));
 
+type Mode = 'list' | 'chart';
+
 const App = (): JSX.Element => {
+  const [mode, setMode] = useState('list' as Mode);
   const [tiles, updateTiles] = useLocalStorage('tiles', initialTiles as Tile[]);
 
-  const addNewTile = useCallback(
-    (tileData: Tile) => {
-      if (typeof window === 'undefined') {
-        return;
-      }
+  const switchToList = useCallback(() => {
+    setMode('list');
+  }, []);
 
-      // get latest Tile beacuse of lack of performance of the useLocalStorage hook
-      const latestTiles = parseJSON(
-        window.localStorage.getItem('tiles'),
-      ) as Tile[];
-
-      const newTiles = [
-        ...(latestTiles || []),
-        {
-          ...tileData,
-          id: generateId(10),
-        },
-      ];
-
-      updateTiles(newTiles);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [updateTiles],
-  );
-
-  const removeTile = useCallback(
-    (tileData: Tile) => {
-      if (typeof window === 'undefined') {
-        return;
-      }
-
-      const { id } = tileData;
-      // get latest Tile beacuse of lack of performance of the useLocalStorage hook
-      const latestTiles = parseJSON(
-        window.localStorage.getItem('tiles'),
-      ) as Tile[];
-
-      if (!latestTiles) {
-        return;
-      }
-
-      const newTiles = latestTiles.filter(item => item.id !== id);
-
-      updateTiles(newTiles);
-
-      if (!newTiles.length) {
-        window.localStorage.removeItem('tiles');
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [updateTiles],
-  );
-
-  const updateTile = useCallback(
-    (tileData: Tile) => {
-      if (typeof window === 'undefined') {
-        return;
-      }
-
-      const { id } = tileData;
-      // get latest Tile beacuse of lack of performance of the useLocalStorage hook
-      const latestTiles = parseJSON(
-        window.localStorage.getItem('tiles'),
-      ) as Tile[];
-
-      if (!latestTiles) {
-        return;
-      }
-
-      const newTiles = latestTiles.map(item => {
-        if (item.id === id) {
-          return {
-            ...item,
-            ...tileData,
-          };
-        }
-        return item;
-      });
-
-      updateTiles(newTiles);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [updateTiles],
-  );
+  const switchToChart = useCallback(() => {
+    setMode('chart');
+  }, []);
 
   return (
     <Body>
-      <Header>Timetracker</Header>
-      <Frame>
-        {tiles.map(data => (
-          <TileWrapper key={data.id}>
-            <TrackingTile
-              tileData={data}
-              updateTile={updateTile}
-              removeTile={removeTile}
-            />
-          </TileWrapper>
-        ))}
-
-        <AddNewTile addNewTile={addNewTile} />
-      </Frame>
+      <Head>
+        <Heading onClick={switchToList}>Timetracker</Heading>
+        <Heading onClick={switchToChart}>Chart</Heading>
+      </Head>
+      {mode === 'list' && (
+        <AllTrackers tiles={tiles} updateTiles={updateTiles} />
+      )}
+      {mode === 'chart' && <Chart tiles={tiles} />}
     </Body>
   );
 };

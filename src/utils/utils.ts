@@ -19,3 +19,46 @@ export const generateId = (length: number): string => {
   }
   return result;
 };
+
+export const putLeadingZero = (num: number, size: number): string => {
+  let numStr = num.toString();
+  while (numStr.length < size) numStr = `0${numStr}`;
+  return numStr;
+};
+
+type Time = {
+  miliseconds: number;
+  seconds: number;
+  minutes: number;
+  hours: number;
+};
+
+export const getTime = (mcs: number): Time => {
+  const time = mcs / 1000;
+
+  const hours = Math.floor(time / 3600);
+
+  const minutesTime = time - hours * 3600;
+  const minutes = Math.floor(minutesTime / 60);
+
+  const seconds = Math.floor(minutesTime - minutes * 60);
+
+  const miliseconds = Math.floor((time / 100) % 10);
+
+  return { miliseconds, seconds, minutes, hours };
+};
+
+export const formatTime = (
+  miliseconds: number,
+  seconds: number,
+  minutes: number,
+  hours: number,
+): string => {
+  return `${hours ? `${putLeadingZero(hours, 2)}h ` : ''}${
+    minutes ? `${putLeadingZero(minutes, 2)}m ` : ''
+  }${
+    seconds || miliseconds
+      ? `${putLeadingZero(seconds, 2)}.${miliseconds || '0'}s `
+      : '00.0s'
+  }`;
+};

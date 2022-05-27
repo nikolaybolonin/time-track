@@ -5,3 +5,5 @@ export const activities = keyMirror({
   work: null,
   animals: null,
 });
+
+export type Activity = keyof typeof activities;
