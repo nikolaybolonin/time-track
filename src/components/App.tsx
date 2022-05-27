@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react';
-import uniqueId from 'lodash/uniqueId';
 import styled from 'styled-components';
 
 import { useLocalStorage } from '../utils/hooks';
 
 import { activities } from '../utils/const';
-import { parseJSON } from '../utils/utils';
+import { generateId, parseJSON } from '../utils/utils';
 import { AddNewTile } from './AddNewTile';
 import { Tile, TrackingTile } from './TrackingTile';
 
@@ -94,7 +93,10 @@ const initialTiles = [
     category: activities.animals,
     activity: 'Cleaning after the cat',
   },
-].map(item => ({ ...item, id: uniqueId() }));
+].map(item => ({
+  ...item,
+  id: generateId(10),
+}));
 
 const App = (): JSX.Element => {
   const [tiles, updateTiles] = useLocalStorage('tiles', initialTiles as Tile[]);
@@ -112,7 +114,10 @@ const App = (): JSX.Element => {
 
       const newTiles = [
         ...(latestTiles || []),
-        { ...tileData, id: uniqueId() },
+        {
+          ...tileData,
+          id: generateId(10),
+        },
       ];
 
       updateTiles(newTiles);
@@ -188,7 +193,7 @@ const App = (): JSX.Element => {
         {tiles.map(data => (
           <TileWrapper key={data.id}>
             <TrackingTile
-              {...data}
+              tileData={data}
               updateTile={updateTile}
               removeTile={removeTile}
             />
