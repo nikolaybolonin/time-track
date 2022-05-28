@@ -44,6 +44,17 @@ export const TileWrapper = styled.div`
   }
 `;
 
+export const Divider = styled.hr`
+  width: 100%;
+  height: 0.2em;
+  background-color: rgba(255, 255, 255, 0.3);
+  border: none;
+
+  &.red {
+    background-color: red;
+  }
+`;
+
 interface IProps {
   tiles: Tile[];
   categories: Categories;
@@ -140,13 +151,14 @@ const AllTrackers = ({
     [updateTiles],
   );
 
+  const activeTiles = tiles.filter(({ lastTimeStamp }) => lastTimeStamp);
+
   return (
     <>
-      {Object.keys(categories).map(category => (
-        <Frame key={category}>
-          {tiles
-            .filter(tile => tile.category === category)
-            .map(data => (
+      {!!activeTiles.length && (
+        <>
+          <Frame>
+            {activeTiles.map(data => (
               <TileWrapper key={data.id}>
                 <TrackingTile
                   tileData={data}
@@ -155,9 +167,35 @@ const AllTrackers = ({
                 />
               </TileWrapper>
             ))}
+          </Frame>
 
-          <AddNewTile addNewTile={addNewTile} category={categories[category]} />
-        </Frame>
+          <Divider className="red" />
+        </>
+      )}
+
+      {Object.keys(categories).map(category => (
+        <>
+          <Frame>
+            {tiles
+              .filter(tile => tile.category === category)
+              .map(data => (
+                <TileWrapper key={data.id}>
+                  <TrackingTile
+                    tileData={data}
+                    updateTile={updateTile}
+                    removeTile={removeTile}
+                  />
+                </TileWrapper>
+              ))}
+
+            <AddNewTile
+              addNewTile={addNewTile}
+              category={categories[category]}
+            />
+          </Frame>
+
+          <Divider />
+        </>
       ))}
     </>
   );

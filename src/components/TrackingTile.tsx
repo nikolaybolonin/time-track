@@ -70,26 +70,29 @@ export const TrackingTile = ({
   updateTile,
   removeTile,
 }: TrackingTileProps): JSX.Element => {
-  const { id, category, activity, ...props } = tileData;
+  const { id, category, activity, time, lastTimeStamp } = tileData;
 
   const [editMode, setEditMode] = useState(false);
-  const [time, setTime] = useState(props.time || 0);
   const [timer, setTimer] = useState(
-    props.lastTimeStamp
-      ? (props.time || 0) + Date.now() - props.lastTimeStamp
-      : props.time || 0,
+    lastTimeStamp ? (time || 0) + Date.now() - lastTimeStamp : time || 0,
   );
-  const [lastTimeStamp, setTimeStamp] = useState(props.lastTimeStamp || 0);
 
   const onClickTile = useCallback(() => {
     if (lastTimeStamp) {
-      setTimeStamp(0);
-      setTime(time + Date.now() - lastTimeStamp);
-      setTimer(time + Date.now() - lastTimeStamp);
+      updateTile({
+        id,
+        time: (time || 0) + Date.now() - lastTimeStamp,
+        lastTimeStamp: 0,
+      });
+      setTimer((time || 0) + Date.now() - lastTimeStamp);
     } else {
-      setTimeStamp(Date.now());
+      updateTile({
+        id,
+        lastTimeStamp: Date.now(),
+      });
     }
-  }, [lastTimeStamp, time]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tileData, updateTile]);
 
   const onClickX: React.MouseEventHandler<Element> = useCallback(
     event => {
@@ -116,59 +119,53 @@ export const TrackingTile = ({
 
   const onClickSave = useCallback(
     (data: Tile) => {
-      setTime(data.time || 0);
+      updateTile(data);
+
       if (lastTimeStamp) {
-        const timestamp = data.lastTimeStamp || Date.now();
-        setTimeStamp(0);
         setTimeout(() => {
           setTimer(data.time || 0);
-          setTimeStamp(timestamp);
         }, 100);
       } else {
         setTimer(data.time || 0);
-        setTimeStamp(data.lastTimeStamp || 0);
       }
-      updateTile(data);
+
       setEditMode(false);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [lastTimeStamp, updateTile],
   );
 
   const onClickR: React.MouseEventHandler<Element> = useCallback(
     event => {
       event.stopPropagation();
-      setTime(0);
+
+      updateTile({
+        id,
+        time: 0,
+        lastTimeStamp: lastTimeStamp ? Date.now() : 0,
+      });
       if (lastTimeStamp) {
-        const timestamp = Date.now();
-        setTimeStamp(0);
         setTimeout(() => {
           setTimer(0);
-          setTimeStamp(timestamp);
         }, 100);
       } else {
         setTimer(0);
       }
-      updateTile({ id, time: 0 });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [lastTimeStamp, updateTile],
+    [tileData, updateTile],
   );
-
-  useEffect(() => {
-    updateTile({ id, time, lastTimeStamp });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastTimeStamp, updateTile]);
 
   useEffect(() => {
     if (lastTimeStamp) {
       const interval = setInterval(() => {
-        setTimer(time + Date.now() - lastTimeStamp);
+        setTimer((time || 0) + Date.now() - lastTimeStamp);
       }, 100);
 
       return () => clearInterval(interval);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastTimeStamp]);
+  }, [tileData]);
 
   return (
     <TileContainer onClick={onClickTile}>
