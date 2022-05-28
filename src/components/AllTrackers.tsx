@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 
+import { Categories, Tile } from '../utils/const';
 import { generateId, parseJSON } from '../utils/utils';
 import { AddNewTile } from './AddNewTile';
-import { Tile, TrackingTile } from './TrackingTile';
+import { TrackingTile } from './TrackingTile';
 
 export const Frame = styled.div`
   position: relative;
@@ -45,10 +46,15 @@ export const TileWrapper = styled.div`
 
 interface IProps {
   tiles: Tile[];
+  categories: Categories;
   updateTiles: (tiles: Tile[]) => void;
 }
 
-const AllTrackers = ({ tiles, updateTiles }: IProps): JSX.Element => {
+const AllTrackers = ({
+  tiles,
+  categories,
+  updateTiles,
+}: IProps): JSX.Element => {
   const addNewTile = useCallback(
     (tileData: Tile) => {
       if (typeof window === 'undefined') {
@@ -135,19 +141,25 @@ const AllTrackers = ({ tiles, updateTiles }: IProps): JSX.Element => {
   );
 
   return (
-    <Frame>
-      {tiles.map(data => (
-        <TileWrapper key={data.id}>
-          <TrackingTile
-            tileData={data}
-            updateTile={updateTile}
-            removeTile={removeTile}
-          />
-        </TileWrapper>
-      ))}
+    <>
+      {Object.keys(categories).map(category => (
+        <Frame key={category}>
+          {tiles
+            .filter(tile => tile.category === category)
+            .map(data => (
+              <TileWrapper key={data.id}>
+                <TrackingTile
+                  tileData={data}
+                  updateTile={updateTile}
+                  removeTile={removeTile}
+                />
+              </TileWrapper>
+            ))}
 
-      <AddNewTile addNewTile={addNewTile} />
-    </Frame>
+          <AddNewTile addNewTile={addNewTile} category={categories[category]} />
+        </Frame>
+      ))}
+    </>
   );
 };
 

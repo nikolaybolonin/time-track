@@ -1,13 +1,12 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { useLocalStorage } from '../utils/hooks';
 
-import { activities } from '../utils/const';
-import { generateId } from '../utils/utils';
+import { activities, Categories, Category, Tile } from '../utils/const';
+import { generateId, getRandomColor } from '../utils/utils';
 import AllTrackers from './AllTrackers';
 import Chart from './Chart';
-import { Tile } from './TrackingTile';
 
 export const Body = styled.div`
   position: relative;
@@ -76,9 +75,27 @@ const initialTiles = [
 
 type Mode = 'list' | 'chart';
 
+const getCategoriesData = (tilesData: Tile[]): Categories => {
+  const categories = tilesData.reduce((acc, tile) => {
+    return {
+      ...acc,
+      [(tile.category as string) || 'others']: {
+        name: tile.category,
+        color: `#${getRandomColor()}`,
+      } as Category,
+    };
+  }, {});
+  return categories;
+};
+
 const App = (): JSX.Element => {
   const [mode, setMode] = useState('list' as Mode);
   const [tiles, updateTiles] = useLocalStorage('tiles', initialTiles as Tile[]);
+  const [categories, updateCategories] = useState(getCategoriesData(tiles));
+
+  useEffect(() => {
+    updateCategories(getCategoriesData(tiles));
+  }, [tiles]);
 
   const switchToList = useCallback(() => {
     setMode('list');
@@ -95,9 +112,13 @@ const App = (): JSX.Element => {
         <Heading onClick={switchToChart}>Chart</Heading>
       </Head>
       {mode === 'list' && (
-        <AllTrackers tiles={tiles} updateTiles={updateTiles} />
+        <AllTrackers
+          tiles={tiles}
+          categories={categories}
+          updateTiles={updateTiles}
+        />
       )}
-      {mode === 'chart' && <Chart tiles={tiles} />}
+      {mode === 'chart' && <Chart tiles={tiles} categories={categories} />}
     </Body>
   );
 };

@@ -11,9 +11,8 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 
-import { activities, Activity } from '../utils/const';
+import { Activity, Categories, Tile } from '../utils/const';
 import { formatTime, getTime } from '../utils/utils';
-import { Tile } from './TrackingTile';
 
 export const ChartWrapper = styled.div`
   font-size: 0.6em;
@@ -21,8 +20,8 @@ export const ChartWrapper = styled.div`
   height: 90vh;
 
   .customized-tooltip-content .list {
-    padding: 0.3em;
-    background-color: rgba(255, 255, 255, 0.7);
+    padding: 0.3em 0.3em 0.3em 1.3em;
+    background-color: rgba(255, 255, 255, 0.3);
     border-radius: 0.3em;
   }
 `;
@@ -94,17 +93,12 @@ const getChartData = (tilesData: Tile[]) => {
   return [currentPoint, currentPoint];
 };
 
-const activityColor = {
-  [activities.animals]: 'red',
-  [activities.selftime]: 'green',
-  [activities.work]: 'blue',
-};
-
 interface IProps {
   tiles: Tile[];
+  categories: Categories;
 }
 
-const Chart = ({ tiles }: IProps): JSX.Element => {
+const Chart = ({ tiles, categories }: IProps): JSX.Element => {
   const [data, setData] = useState(getChartData(tiles));
 
   useEffect(() => {
@@ -136,7 +130,8 @@ const Chart = ({ tiles }: IProps): JSX.Element => {
           <Tooltip content={renderTooltipContent} />
 
           {tiles.map(tile => {
-            const color = activityColor[tile.category as Activity] || 'yellow';
+            const color =
+              categories[tile.category as Activity]?.color || 'yellow';
 
             return (
               <Area

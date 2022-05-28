@@ -1,8 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
-import { activities } from '../utils/const';
-import { Tile } from './TrackingTile';
+import { defaultTile, Tile } from '../utils/const';
 
 export const InputsContainer = styled.div`
   display: flex;
@@ -35,13 +34,6 @@ interface EditFormProps {
   tileData?: Tile;
   onSave: (tileData: Tile) => void;
 }
-
-const defaultTile = {
-  category: activities.selftime,
-  activity: 'Coding',
-  time: 0,
-  lastTimeStamp: 0,
-};
 
 const fields = Object.keys(defaultTile) as (keyof typeof defaultTile)[];
 

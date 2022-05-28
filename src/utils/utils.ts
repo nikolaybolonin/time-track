@@ -43,7 +43,7 @@ export const getTime = (mcs: number): Time => {
 
   const seconds = Math.floor(minutesTime - minutes * 60);
 
-  const miliseconds = Math.floor((time / 100) % 10);
+  const miliseconds = Math.floor((mcs / 100) % 10);
 
   return { miliseconds, seconds, minutes, hours };
 };
@@ -62,3 +62,6 @@ export const formatTime = (
       : '00.0s'
   }`;
 };
+
+export const getRandomColor = (): string =>
+  Math.floor(Math.random() * 16777215).toString(16);

@@ -1,14 +1,23 @@
 import React, { useCallback, useState } from 'react';
 
+import { Category, defaultTile, Tile } from '../utils/const';
 import { EditForm } from './EditForm';
-import { CloseButton, Tile, TileContainer } from './TrackingTile';
+import { CloseButton, TileContainer } from './TrackingTile';
 
 interface AddNewTileProps {
   addNewTile: (tileData: Tile) => void;
+  category: Category;
 }
 
-export const AddNewTile = ({ addNewTile }: AddNewTileProps): JSX.Element => {
+export const AddNewTile = ({
+  addNewTile,
+  category,
+}: AddNewTileProps): JSX.Element => {
   const [active, setActive] = useState(false);
+  const [newTileData] = useState({
+    ...defaultTile,
+    category: category.name,
+  } as Tile);
 
   const onClickTile = useCallback(() => {
     if (!active) {
@@ -24,7 +33,7 @@ export const AddNewTile = ({ addNewTile }: AddNewTileProps): JSX.Element => {
     <TileContainer onClick={onClickTile}>
       {active ? (
         <>
-          <EditForm onSave={addNewTile} />
+          <EditForm onSave={addNewTile} tileData={newTileData} />
 
           <CloseButton onClick={onClickX}>x</CloseButton>
         </>

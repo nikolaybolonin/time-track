@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+import { Tile } from '../utils/const';
 import { EditForm } from './EditForm';
 import TimerDisplay from './TimerDisplay';
 
@@ -57,14 +58,6 @@ export const EditButton = styled(ResetButton)`
   right: auto;
   left: 0.4em;
 `;
-
-export type Tile = {
-  id: string;
-  category?: string;
-  activity?: string;
-  time?: number;
-  lastTimeStamp?: number;
-};
 
 interface TrackingTileProps {
   tileData: Tile;
