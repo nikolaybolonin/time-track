@@ -65,6 +65,12 @@ export const formatTime = (
   }`;
 };
 
+export const getFormatedTime = (mcs: number): string => {
+  const t = getTime(mcs);
+  const formatedTime = formatTime(t.miliseconds, t.seconds, t.minutes, t.hours);
+  return formatedTime;
+};
+
 export const getRandomColor = (): string =>
   Math.floor(Math.random() * 16777215).toString(16);
 

@@ -2,19 +2,22 @@ import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 import { defaultTile, Tile } from '../utils/const';
+import { getFormatedTime } from '../utils/utils';
 
 export const InputsContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
 export const Input = styled.input`
-  margin: 2px;
-  margin-bottom: 12px;
+  margin: 0.1em;
+  margin-bottom: 0.5em;
+  font-size: 0.7em;
+  line-height: 0.7em;
 `;
 
 export const Label = styled.label`
-  font-size: 14px;
-  line-height: 14px;
+  font-size: 0.7em;
+  line-height: 0.7em;
 `;
 
 export const Button = styled.div`
@@ -22,8 +25,8 @@ export const Button = styled.div`
   justify-content: center;
   align-content: center;
   cursor: pointer;
-  font-size: 30px;
-  line-height: 30px;
+  font-size: 1em;
+  line-height: 1em;
 
   &:hover {
     color: red;
@@ -35,11 +38,12 @@ interface EditFormProps {
   onSave: (tileData: Tile) => void;
 }
 
-const fields = Object.keys(defaultTile) as (keyof typeof defaultTile)[];
+const fields = ['category', 'activity', 'time'] as const;
 
 export const EditForm = ({ onSave, tileData }: EditFormProps): JSX.Element => {
   const initData = tileData || defaultTile;
   const [tile, updateTile] = useState(initData as Tile);
+  const [time, updateTime] = useState(getFormatedTime(initData.time || 0));
 
   const onChangeInputValue = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +59,10 @@ export const EditForm = ({ onSave, tileData }: EditFormProps): JSX.Element => {
         ...tile,
         [id]: formattedValue,
       });
+
+      if (id === 'time') {
+        updateTime(getFormatedTime(+value || 0));
+      }
     },
     [tile],
   );
@@ -84,6 +92,9 @@ export const EditForm = ({ onSave, tileData }: EditFormProps): JSX.Element => {
           />
         </>
       ))}
+
+      <Label as="div">{time}</Label>
+
       <Button onClick={onClickButton}>Save</Button>
     </InputsContainer>
   );
