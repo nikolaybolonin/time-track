@@ -3,8 +3,8 @@ import styled from 'styled-components';
 
 import { useLocalStorage } from '../utils/hooks';
 
-import { activities, Categories, Category, Tile } from '../utils/const';
-import { generateId, getRandomColor } from '../utils/utils';
+import { activities, Tile } from '../utils/const';
+import { generateId, getCategoriesData } from '../utils/utils';
 import AllTrackers from './AllTrackers';
 import Chart from './Chart';
 
@@ -74,19 +74,6 @@ const initialTiles = [
 }));
 
 type Mode = 'list' | 'chart';
-
-const getCategoriesData = (tilesData: Tile[]): Categories => {
-  const categories = tilesData.reduce((acc, tile) => {
-    return {
-      ...acc,
-      [(tile.category as string) || 'others']: {
-        name: tile.category,
-        color: `#${getRandomColor()}`,
-      } as Category,
-    };
-  }, {});
-  return categories;
-};
 
 const App = (): JSX.Element => {
   const [mode, setMode] = useState('list' as Mode);

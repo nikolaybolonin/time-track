@@ -11,6 +11,7 @@ export type Activity = keyof typeof activities;
 export type Category = {
   name: string;
   color: string;
+  total: number;
 };
 
 export type Categories = {
@@ -23,6 +24,7 @@ export type Tile = {
   activity?: string;
   time?: number;
   lastTimeStamp?: number;
+  color?: string;
 };
 
 export const defaultTile = {

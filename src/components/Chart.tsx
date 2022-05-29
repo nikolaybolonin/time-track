@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import reverse from 'lodash/reverse';
+import sortBy from 'lodash/sortBy';
 import {
   Area,
   AreaChart,
@@ -11,8 +13,8 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 
-import { Activity, Categories, Tile } from '../utils/const';
-import { formatTime, getTime } from '../utils/utils';
+import { Activity, Categories, Category, Tile } from '../utils/const';
+import { formatTime, getCategoriesData, getTime } from '../utils/utils';
 
 export const ChartWrapper = styled.div`
   font-size: 0.6em;
@@ -26,6 +28,10 @@ export const ChartWrapper = styled.div`
   }
 `;
 
+export const CategoryHeading = styled.div`
+  padding-top: 0.4em;
+`;
+
 const toPercent = (decimal: number) => `${(decimal * 100).toFixed(1)}%`;
 
 const getPercent = (value: number, total: number) => {
@@ -35,9 +41,25 @@ const getPercent = (value: number, total: number) => {
 };
 
 type Point = {
+  dataKey?: string | number;
   name?: string;
   color?: string;
   value?: number;
+};
+
+const getSortedCategories = (tilesData: Tile[], categories: Categories) => {
+  const arrayOfCategories = Object.keys(categories).map(
+    category => categories[category],
+  );
+  const sortedCategories = sortBy(arrayOfCategories, [({ total }) => -total]);
+  return sortedCategories;
+};
+
+const getSortedTiles = (tilesData: Tile[], sortedCategories: Category[]) => {
+  const sortedTiles = sortedCategories.reduce((acc: Tile[], { name }) => {
+    return [...acc, ...tilesData.filter(({ category }) => category === name)];
+  }, []);
+  return sortedTiles;
 };
 
 const renderTooltipContent = (
@@ -49,6 +71,24 @@ const renderTooltipContent = (
     0,
   ) as number;
 
+  const tiles = payload.map(
+    entry =>
+      ({
+        id: entry.dataKey,
+        activity: entry.name,
+        category: entry.unit,
+        time: entry.value,
+        color: entry.color,
+      } as Tile),
+  );
+
+  const categories = getCategoriesData(tiles);
+  const sortedCategories = getSortedCategories(tiles, categories);
+  const sortedTiles = getSortedTiles(tiles, sortedCategories);
+
+  // eslint-disable-next-line no-console
+  console.log(categories, sortedTiles);
+
   const t = getTime(total);
   const totalTime = formatTime(t.miliseconds, t.seconds, t.minutes, t.hours);
 
@@ -56,19 +96,46 @@ const renderTooltipContent = (
     <div className="customized-tooltip-content">
       <p className="total">{`${label} (Total: ${totalTime})`}</p>
       <ul className="list">
-        {payload.map((entry: Point, index: number) => {
-          const time = entry.value || 0;
-          const { miliseconds, seconds, minutes, hours } = getTime(time);
-          const value = formatTime(miliseconds, seconds, minutes, hours);
+        {sortedCategories.map(({ name, ...props }) => {
+          const c = getTime(props.total);
+          const cTime = formatTime(
+            c.miliseconds,
+            c.seconds,
+            c.minutes,
+            c.hours,
+          );
 
           return (
-            // eslint-disable-next-line react/no-array-index-key
-            <li key={`item-${index}`} style={{ color: entry.color }}>
-              {`${entry.name}: ${value}(${getPercent(
-                entry?.value || 0,
+            <>
+              <CategoryHeading>{`${name}: ${cTime}(${getPercent(
+                props.total,
                 total,
-              )})`}
-            </li>
+              )})`}</CategoryHeading>
+
+              {sortedTiles
+                .filter(({ category }) => category === name)
+                .map((tile: Tile, index: number) => {
+                  const time = tile.time || 0;
+                  const { miliseconds, seconds, minutes, hours } =
+                    getTime(time);
+                  const value = formatTime(
+                    miliseconds,
+                    seconds,
+                    minutes,
+                    hours,
+                  );
+
+                  return (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <li key={`item-${index}`} style={{ color: tile.color }}>
+                      {`${tile.activity}: ${value}(${getPercent(
+                        tile?.time || 0,
+                        total,
+                      )})`}
+                    </li>
+                  );
+                })}
+            </>
           );
         })}
       </ul>
@@ -76,8 +143,10 @@ const renderTooltipContent = (
   );
 };
 
-const getChartData = (tilesData: Tile[]) => {
-  const currentPoint = tilesData.reduce(
+const getChartData = (tilesData: Tile[], categories: Categories) => {
+  const sortedCategories = getSortedCategories(tilesData, categories);
+  const sortedTiles = getSortedTiles(tilesData, sortedCategories);
+  const currentPoint = sortedTiles.reduce(
     (acc, tile) => {
       return {
         ...acc,
@@ -99,15 +168,18 @@ interface IProps {
 }
 
 const Chart = ({ tiles, categories }: IProps): JSX.Element => {
-  const [data, setData] = useState(getChartData(tiles));
+  const [data, setData] = useState(getChartData(tiles, categories));
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setData(getChartData(tiles));
+      setData(getChartData(tiles, categories));
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [tiles]);
+  }, [tiles, categories]);
+
+  const sortedCategories = getSortedCategories(tiles, categories);
+  const sortedTiles = getSortedTiles(tiles, sortedCategories);
 
   return (
     <ChartWrapper>
@@ -129,7 +201,7 @@ const Chart = ({ tiles, categories }: IProps): JSX.Element => {
           <YAxis tickFormatter={toPercent} />
           <Tooltip content={renderTooltipContent} />
 
-          {tiles.map(tile => {
+          {reverse([...sortedTiles]).map(tile => {
             const color =
               categories[tile.category as Activity]?.color || 'yellow';
 
@@ -142,6 +214,7 @@ const Chart = ({ tiles, categories }: IProps): JSX.Element => {
                 stackId="1"
                 stroke={color}
                 fill={color}
+                unit={tile.category}
               />
             );
           })}

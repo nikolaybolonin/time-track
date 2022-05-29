@@ -1,3 +1,5 @@
+import { Categories, Category, Tile } from './const';
+
 // A wrapper for "JSON.parse()"" to support "undefined" value
 export function parseJSON<T>(value: string | null): T | undefined {
   try {
@@ -65,3 +67,18 @@ export const formatTime = (
 
 export const getRandomColor = (): string =>
   Math.floor(Math.random() * 16777215).toString(16);
+
+export const getCategoriesData = (tilesData: Tile[]): Categories => {
+  const categories = tilesData.reduce((acc: Categories, tile) => {
+    const category = (tile.category || 'others') as string;
+    return {
+      ...acc,
+      [category]: {
+        name: tile.category,
+        color: `#${getRandomColor()}`,
+        total: (acc[category]?.total || 0) + (tile.time || 0),
+      } as Category,
+    };
+  }, {});
+  return categories;
+};
